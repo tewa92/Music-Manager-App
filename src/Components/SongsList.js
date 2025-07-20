@@ -4,8 +4,19 @@ import styled from "@emotion/styled";
 import { Edit, Trash2, ChevronDown } from "lucide-react";
 import * as Select from "@radix-ui/react-select";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
+import * as Dialog from "@radix-ui/react-dialog";
+
 
 import Pagination from "./Pagination";
+import { updateSong, deleteSong } from '../features/songs/songsSlice';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
+import { useEffect } from 'react';
+import { fetchSongs } from '../features/songs/songsSlice';
+// import { Dialog } from '@radix-ui/react-dialog';
+import SongForm from './SongForm';
+
 
 
 // Songs Collection
@@ -302,13 +313,35 @@ const initialSongs = [
 
 
 function SongsList() {
-    const [songs, setSongs] = useState(initialSongs);
+    const dispatch = useDispatch();
+
+    const songs = useSelector(state => state.songs.list);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [genreFilter, setGenreFilter] = useState("all");
+
+    const searchTerm = useSelector(state => state.songs.searchTerm);
+    const genreFilter = useSelector(state => state.songs.genreFilter);
+    
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [editingSong, setEditingSong] = useState(null);
 
 
+
+
+    const handleEdit = (song) => {
+        setEditingSong(song);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleSaveEdit = (updatedSong) => {
+        dispatch(updateSong(updatedSong));
+        setIsEditDialogOpen(false);
+        setEditingSong(null);
+    }
+
+    const handleDeleteSong = (_id) => {
+        dispatch(deleteSong(_id));
+    };
 
     const filteredSongs = useMemo(() => {
         return songs.filter((song) => {
@@ -332,6 +365,9 @@ function SongsList() {
     }, [songs]);
 
 
+    useEffect(() => {
+        dispatch(fetchSongs());
+    }, [dispatch]);
 
     return (
         <CardSong>
@@ -347,6 +383,7 @@ function SongsList() {
                     <CardSongTable>
                         <thead>
                             <CardSongTableRow>
+                                <CardSongTableHead>ID</CardSongTableHead>
                                 <CardSongTableHead>Title</CardSongTableHead>
                                 <CardSongTableHead>Artist</CardSongTableHead>
                                 <CardSongTableHead>Album</CardSongTableHead>
@@ -365,7 +402,10 @@ function SongsList() {
                                 </CardSongTableRow>
                             ) : (
                                 paginatedSongs.map((song) => (
-                                    <CardSongTableRow key={song.id}>
+                                    <CardSongTableRow key={song._id}>
+                                        <CardSongTableCell>
+                                            {song._id}
+                                        </CardSongTableCell>
                                         <CardSongTableCell>
                                             {song.title}
                                         </CardSongTableCell>
@@ -408,12 +448,17 @@ function SongsList() {
                                                         />
                                                         <AlertDialog.Content
                                                             style={{
+                                                                position: "fixed",
+                                                                top: "50%",
+                                                                left: "50%",
+                                                                transform: "translate(-50%, -50%)",
                                                                 background: "#fff",
                                                                 borderRadius: "8px",
                                                                 padding: "2rem",
-                                                                maxWidth: "400px",
-                                                                margin: "10% auto",
-                                                                position: "relative",
+                                                                maxWidth: "28rem",
+                                                                width: "90%",
+                                                                maxHeight: "90vh",
+                                                                overflowY: "auto",
                                                                 zIndex: 1000,
                                                             }}
                                                         >
@@ -431,7 +476,7 @@ function SongsList() {
 
                                                                 </AlertDialog.Cancel>
                                                                 <AlertDialog.Action asChild>
-                                                                    <Button onClick={() => deleteSong(song.id)}>
+                                                                    <Button onClick={() => handleDeleteSong(song._id)}>
                                                                         Delete
                                                                     </Button>
                                                                 </AlertDialog.Action>
@@ -489,13 +534,43 @@ function SongsList() {
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
-                                OnPageChange={setCurrentPage}
+                                onPageChange={setCurrentPage}
                             />
                         </ControlsRow>
 
                     </PaginationBar>
                 )}
             </CardSongContent>
+
+            <Dialog.Root open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                {/* <Dialog.Trigger>Edit</Dialog.Trigger> */}
+                <Dialog.Portal>
+                    <Dialog.Overlay style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0, 0, 0, 0.5)",
+                    }} />
+                    <Dialog.Content
+                        style={{
+                            position: "fixed",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            background: "#fff",
+                            borderRadius: "8px",
+                            padding: "2rem",
+                            maxWidth: "400px",
+                            width: "90%",
+                            maxHeight: "90vh",
+                            overflowY: "auto",
+                            zIndex: 1000,
+                        }}>
+                        <Dialog.Title>Edit Song</Dialog.Title>
+                        <SongForm song={editingSong} onSubmit={handleSaveEdit} />
+                    </Dialog.Content>
+                </Dialog.Portal>
+
+            </Dialog.Root>
 
         </CardSong>
     )
