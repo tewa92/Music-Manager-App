@@ -30,16 +30,16 @@ const PageInfo = styled.span`
 font-size: 0.875rem;
 `;
 
-function Pagination({ currentPage, totalPages, OnPageChange }){
+function Pagination({ currentPage, totalPages, onPageChange }){
     const goPrev = () => {
         if (currentPage > 1){
-            OnPageChange(currentPage - 1);
+            onPageChange(currentPage - 1);
         }
     };
 
     const goNext = () => {
         if (currentPage < totalPages) {
-            OnPageChange(currentPage + 1);
+            onPageChange(currentPage + 1);
         }
     };
 
