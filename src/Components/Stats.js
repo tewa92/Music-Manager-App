@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import styled from "@emotion/styled";
+import { useSelector } from 'react-redux';
 
 
 // Container for the stats grid
@@ -189,25 +190,24 @@ const initialSongs = [
 
 
 function Stats() {
-        const [songs, setSongs] = useState(initialSongs);
-        const [searchTerm, setSearchTerm] = useState("");
-        const [genreFilter, setGenreFilter] = useState("all");
+    const songs = useSelector(state => state.songs.list);
+    const searchTerm = useSelector(state => state.songs.searchTerm);
+    const genreFilter = useSelector(state => state.songs.genreFilter);
 
-        const genresList = ["Pop", "Rock", "Hip-Hop", "Jazz", "Classical", "Country", "Electronic", "Reggae", "Blues", "Folk"];
+    const filteredSongs = useMemo(() => {
+        return songs.filter((song) => {
+            const matchesSearch =
+                song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                song.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                song.album.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesGenre = genreFilter === "all" || song.genre === genreFilter;
+            return matchesSearch && matchesGenre;
+        });
+    }, [songs, searchTerm, genreFilter]);
 
-
-            const filteredSongs = useMemo(() => {
-                return songs.filter((song) => {
-                    const matchesSearch =
-                        song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        song.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        song.album.toLowerCase().includes(searchTerm.toLowerCase());
-                    const matchesGenre = genreFilter === "all" || song.genre === genreFilter;
-                    return matchesSearch && matchesGenre;
-                });
-            }, [songs, searchTerm, genreFilter]);
-        
-
+    const uniqueGenres = useMemo(() => {
+        return Array.from(new Set(songs.map(s => s.genre))).filter(Boolean);
+    }, [songs]);
 
     return (
         <StatsGrid>
@@ -215,30 +215,25 @@ function Stats() {
                 <CardHeader>
                     <CardTitle>Total Songs</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div>{songs.length}</div>
-                </CardContent>
+                <CardContent>{songs.length}</CardContent>
             </Card>
 
             <Card>
                 <CardHeader>
                     <CardTitle>Filtered Results</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div>{filteredSongs.length}</div>
-                </CardContent>
+                <CardContent>{filteredSongs.length}</CardContent>
             </Card>
 
             <Card>
                 <CardHeader>
                     <CardTitle>Genres</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div>{genresList.length}</div>
-                </CardContent>
+                <CardContent>{uniqueGenres.length}</CardContent>
             </Card>
         </StatsGrid>
-    )
+    );
 }
+
 
 export default Stats
