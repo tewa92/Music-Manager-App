@@ -5,6 +5,13 @@ import * as Select from "@radix-ui/react-select";
 import * as Dialog from "@radix-ui/react-dialog";
 import SongForm from "./SongForm";
 
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { addSong, setSearchTerm, setGenreFilter } from '../features/songs/songsSlice';
+
+
+
+
 
 
 // Search container with input and filter
@@ -137,17 +144,20 @@ const Description = styled(Dialog.Description)`
 
 
 function SearchAndFilter() {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [genreFilter, setGenreFilter] = useState("all");
+    const dispatch = useDispatch();
+
+    const searchTerm = useSelector(state => state.songs.searchTerm);
+    const genreFilter = useSelector(state => state.songs.genreFilter);
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const genresList = ["Pop", "Rock", "Hip-Hop", "Jazz", "Classical", "Country", "Electronic", "Reggae", "Blues", "Folk"];
 
 
-    const addSong = (songData) => {
-        console.log("New Song:", songData);
-        // later: dispatch to Redux or send to API
+    const handleAddSong = (songData) => {
+        dispatch(addSong(songData));
         setIsAddDialogOpen(false);
-    };
+    }
+
+     
 
 
     return (
@@ -157,13 +167,13 @@ function SearchAndFilter() {
                 <StyledInput
                     placeholder="Search songs, artists, or albums..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                 />
             </InputWrapper>
 
 
             <div style={{ position: "relative" }}>
-                <Select.Root value={genreFilter} onValueChange={setGenreFilter}>
+                <Select.Root value={genreFilter} onValueChange={(value) => dispatch(setGenreFilter(value))}>
                     <SelectTrigger>
                         <Select.Value placeholder="Filter by genre" />
                         <ChevronDown size={16} />
@@ -193,11 +203,13 @@ function SearchAndFilter() {
                 <Content>
                     <Title>Add New Song</Title>
                     <Description>Fill in the details to add a new song to your collection.</Description>
-                    <SongForm onSubmit={addSong} />
+                    <SongForm onSubmit={handleAddSong} />
                 </Content>
             </Dialog.Root>
         </SearchContainer>
     )
 }
+
+
 
 export default SearchAndFilter
