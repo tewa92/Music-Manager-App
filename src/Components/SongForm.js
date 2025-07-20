@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import styled from "@emotion/styled";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
 
 const Form = styled.form`
   top: 80%;
@@ -33,40 +34,121 @@ const SubmitButton = styled.button`
   }
 `;
 
-export default function SongForm({ onSubmit }) {
-    const [title, setTitle] = useState("");
-    const [artist, setArtist] = useState("");
-    const [album, setAlbum] = useState("");
-    const [year, setYear] = useState("");
+// useEffect(() => {
+//   // Reset form fields when the component mounts
+//   setId("");
+//   setTitle("");
+//   setArtist("");
+//   setAlbum("");
+//   setGenre("");
+//   setDuration("");
+//   setReleaseYear("");
+// }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit({ title, artist, album, year });
+
+
+function SongForm({ song, onSubmit }) {
+  const [id, setId] = useState(song?.id || "");
+  const [title, setTitle] = useState(song?.title || "");
+  const [artist, setArtist] = useState(song?.artist || "");
+  const [album, setAlbum] = useState(song?.album || "");
+  const [genre, setGenre] = useState(song?.genre || "");
+  const [duration, setDuration] = useState(song?.duration || "");
+  const [releaseYear, setReleaseYear] = useState(song?.releaseYear || "");
+
+  useEffect(() =>{
+    if(song){
+      setId(song._id);
+      setTitle(song.title);
+      setArtist(song.artist);
+      setAlbum(song.album);
+      setGenre(song.genre);
+      setDuration(song.duration);
+      setReleaseYear(song.releaseYear);
+    } else {
+      setId("");
+      setTitle("");
+      setArtist("");
+      setAlbum("");
+      setGenre("");
+      setDuration("");
+      setReleaseYear("");
+    }
+  }, [song]);
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Validate inputs
+    if (!title || !artist || !album || !genre || !duration || !releaseYear) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    // Create a new song object
+    const newSong = {
+      id: id || undefined,
+      title,
+      artist,
+      album,
+      genre,
+      duration,
+      releaseYear,
     };
+    
+    // Call the onSubmit function with the new song data
+    onSubmit(newSong);
 
-    return (
-        <Form onSubmit={handleSubmit}>
-            <Input
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
-            <Input
-                placeholder="Artist"
-                value={artist}
-                onChange={(e) => setArtist(e.target.value)}
-            />
-            <Input
-                placeholder="Album"
-                value={album}
-                onChange={(e) => setAlbum(e.target.value)}
-            />
-            <Input
-                placeholder="Year"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-            />
-            <SubmitButton type="submit">Save Song</SubmitButton>
-        </Form>
-    );
+    // Reset the form fields
+    setTitle("");
+    setArtist("");
+    setAlbum("");
+    setGenre("");
+    setDuration("");
+    setReleaseYear("");
+  };
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Input
+        type="text"
+        placeholder="Song ID "
+        value={id}
+        onChange={(e) => setId(e.target.value)}
+      />
+      <Input
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <Input
+        placeholder="Artist"
+        value={artist}
+        onChange={(e) => setArtist(e.target.value)}
+      />
+      <Input
+        placeholder="Album"
+        value={album}
+        onChange={(e) => setAlbum(e.target.value)}
+      />
+      <Input
+        placeholder="Genre"
+        value={genre}
+        onChange={(e) => setGenre(e.target.value)}
+      />
+      <Input
+        placeholder="Duration"
+        value={duration}
+        onChange={(e) => setDuration(e.target.value)}
+      />
+      <Input
+        placeholder="Release Year"
+        value={releaseYear}
+        onChange={(e) => setReleaseYear(e.target.value)}
+      />
+      <SubmitButton type="submit">Save Song</SubmitButton>
+    </Form>
+  );
 }
+
+export default SongForm;
