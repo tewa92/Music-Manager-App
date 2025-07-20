@@ -16,7 +16,7 @@ import {
 } from './songsSlice';
 
 // API endpoint
-const API_URL = 'http://localhost:5000/api/songs';
+const API_URL = 'https://music-manager-app-backend.onrender.com/api/songs';
 // Fetch songs from the API
 function* fetchSongsSaga() {
     try {
