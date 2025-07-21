@@ -48,7 +48,7 @@ const SubmitButton = styled.button`
 
 
 function SongForm({ song, onSubmit }) {
-  const [id, setId] = useState(song?.id || "");
+
   const [title, setTitle] = useState(song?.title || "");
   const [artist, setArtist] = useState(song?.artist || "");
   const [album, setAlbum] = useState(song?.album || "");
@@ -58,7 +58,6 @@ function SongForm({ song, onSubmit }) {
 
   useEffect(() =>{
     if(song){
-      setId(song._id);
       setTitle(song.title);
       setArtist(song.artist);
       setAlbum(song.album);
@@ -66,7 +65,6 @@ function SongForm({ song, onSubmit }) {
       setDuration(song.duration);
       setReleaseYear(song.releaseYear);
     } else {
-      setId("");
       setTitle("");
       setArtist("");
       setAlbum("");
@@ -87,14 +85,14 @@ function SongForm({ song, onSubmit }) {
 
     // Create a new song object
     const newSong = {
-      id: id || undefined,
       title,
       artist,
       album,
       genre,
-      duration,
-      releaseYear,
+      duration: Number(duration),
+      releaseYear: Number(releaseYear),
     };
+    console.log("New Song Data:", newSong);
     
     // Call the onSubmit function with the new song data
     onSubmit(newSong);
@@ -110,12 +108,7 @@ function SongForm({ song, onSubmit }) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Input
-        type="text"
-        placeholder="Song ID "
-        value={id}
-        onChange={(e) => setId(e.target.value)}
-      />
+
       <Input
         placeholder="Title"
         value={title}
