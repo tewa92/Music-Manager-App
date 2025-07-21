@@ -321,7 +321,7 @@ function SongsList() {
 
     const searchTerm = useSelector(state => state.songs.searchTerm);
     const genreFilter = useSelector(state => state.songs.genreFilter);
-    
+
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [editingSong, setEditingSong] = useState(null);
 
@@ -383,7 +383,6 @@ function SongsList() {
                     <CardSongTable>
                         <thead>
                             <CardSongTableRow>
-                                <CardSongTableHead>ID</CardSongTableHead>
                                 <CardSongTableHead>Title</CardSongTableHead>
                                 <CardSongTableHead>Artist</CardSongTableHead>
                                 <CardSongTableHead>Album</CardSongTableHead>
@@ -403,9 +402,6 @@ function SongsList() {
                             ) : (
                                 paginatedSongs.map((song) => (
                                     <CardSongTableRow key={song._id}>
-                                        <CardSongTableCell>
-                                            {song._id}
-                                        </CardSongTableCell>
                                         <CardSongTableCell>
                                             {song.title}
                                         </CardSongTableCell>
