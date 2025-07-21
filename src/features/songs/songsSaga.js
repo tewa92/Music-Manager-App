@@ -16,10 +16,10 @@ import {
 } from './songsSlice';
 
 // API endpoint
-// const API_URL = 'https://music-manager-app-backend.onrender.com/api/songs';
+const API_URL = 'https://music-manager-app-backend.onrender.com/api/songs';
 
 //local development URL
-const API_URL = 'http://localhost:5000/api/songs'; // Local JSON server URL
+// const API_URL = 'http://localhost:5000/api/songs'; // Local JSON server URL
 
 //687dfe30820b202bab7b77cc
 
